@@ -6,6 +6,9 @@ import Login from './pages/login'
 import Admin from './admin'
 import Buttons from './pages/ui/buttons'
 import NoMatch from './pages/nomatch'
+import City from "./pages/city";
+import Order from "./pages/order";
+import Employee from "./pages/employee";
 
 export default class IRouter extends React.Component {
     render() {
@@ -18,6 +21,9 @@ export default class IRouter extends React.Component {
                             <Switch>
                                 <Route path="/home" component={Home} />
                                 <Route path="/ui/buttons" component={Buttons} />
+                                <Route path="/city" component={City} />
+                                <Route path="/order" component={Order} />
+                                <Route path="/employee" component={Employee} />
                                 <Route component={NoMatch} />
                             </Switch>
                         </Admin>
