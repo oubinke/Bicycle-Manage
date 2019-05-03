@@ -1,14 +1,50 @@
 import JsonP from 'jsonp';
 import axios from 'axios';
-import { Modal } from 'antd'
+import { Modal } from 'antd';
+import Utils from '../utils/utils';
+
 
 export default class Axios {
+
+    static requestList(_this, url, params, isMock) {
+        var data = {
+            params: params
+        }
+        this.ajax({
+            url,
+            data
+        }, isMock).then((data) => {
+            if (data && data.result) {
+                let list;
+                if (data.result.list) {
+                    list = data.result.list.map((item, index) => {
+                        item.key = index;
+                        return item;
+                    });
+                } else {
+                    list = data.result.item_list.map((item, index) => {
+                        item.key = index;
+                        return item;
+                    });
+                }
+                _this.setState({
+                    list,
+                    pagination: Utils.pagination(data, (current) => {
+                        _this.params.page = current;
+                        _this.requestList();
+                    })
+                })
+            }
+        });
+    }
+
+    // 跨域请求天气信息
     static jsonp(options) {
         return new Promise((resolve, reject) => {
             JsonP(options.url, {
                 param: 'callback'
             }, function (err, response) {
-                if  (response.status == 'success') {
+                if (response.status == 'success') {
                     resolve(response);
                 } else {
                     reject(response.message);
@@ -17,36 +53,43 @@ export default class Axios {
         })
     }
 
-    static ajax(options){
+    static ajax(options, isMock) {
         let loading;
-        if (options.data && options.data.isShowLoading !== false){
+        if (options.data && options.data.isShowLoading !== false) {
             loading = document.getElementById('ajaxLoading');
             loading.style.display = 'block';
         }
-        let baseApi = 'https://www.easy-mock.com/mock/5a7278e28d0c633b9c4adbd7/api';
-        return new Promise((resolve,reject)=>{
+        let baseApi;
+        if (isMock) {
+            baseApi = 'https://www.easy-mock.com/mock/5a7278e28d0c633b9c4adbd7/api';
+        } else {
+            // baseApi = 'https://www.easy-mock.com/mock/5a7278e28d0c633b9c4adbd7/api';
+            baseApi = '';
+        }
+        return new Promise((resolve, reject) => {
             axios({
-                url:options.url,
-                method:'get',
-                baseURL:baseApi,
-                timeout:5000,
+                url: options.url,
+                method: 'get',
+                baseURL: baseApi,
+                timeout: 5000,
+                // 对于&&操作符，如果两个操作数都为对象，则返回第二个对象。
                 params: (options.data && options.data.params) || ''
-            }).then((response)=>{
+            }).then((response) => {
                 if (options.data && options.data.isShowLoading !== false) {
                     loading = document.getElementById('ajaxLoading');
                     loading.style.display = 'none';
                 }
-                if (response.status == '200'){
+                if (response.status == '200') {
                     let res = response.data;
-                    if (res.code == '0'){
+                    if (res.code == '0') {
                         resolve(res);
-                    }else{
+                    } else {
                         Modal.info({
-                            title:"提示",
-                            content:res.msg
+                            title: "提示",
+                            content: res.msg
                         })
                     }
-                }else{
+                } else {
                     reject(response.data);
                 }
             })

@@ -1,26 +1,26 @@
 import React from 'react';
-import { Card, Button, Table, Form, Select, Modal, DatePicker, message} from 'antd'
+import { Card, Button, Table, Form, Select, Modal, DatePicker, message } from 'antd'
 import axios from '../../axios'
 import Utils from '../../utils/utils'
 import BaseForm from '../../components/BaseForm'
 const FormItem = Form.Item;
-const Option = Select.Option;
-export default class Order extends React.Component{
-    state  = {
-        orderInfo:{},
-        orderConfirmVisble:false
+
+export default class Order extends React.Component {
+    state = {
+        orderInfo: {},
+        orderConfirmVisble: false
     }
     params = {
         page: 1
     }
     formList = [
         {
-            type:'SELECT',
-            label:'城市',
-            field:'city',
-            placeholder:'全部',
-            initialValue:'1',
-            width:80,
+            type: 'SELECT',
+            label: '城市',
+            field: 'city',
+            placeholder: '全部',
+            initialValue: '0',
+            width: 80,
             list: [{ id: '0', name: '全部' }, { id: '1', name: '北京' }, { id: '2', name: '天津' }, { id: '3', name: '上海' }]
         },
         {
@@ -29,44 +29,30 @@ export default class Order extends React.Component{
         {
             type: 'SELECT',
             label: '订单状态',
-            field:'order_status',
+            field: 'order_status',
             placeholder: '全部',
-            initialValue: '1',
+            initialValue: '0',
             width: 80,
             list: [{ id: '0', name: '全部' }, { id: '1', name: '进行中' }, { id: '2', name: '结束行程' }]
         }
     ]
-    componentDidMount(){
+    componentDidMount() {
         this.requestList()
     }
 
-    handleFilter = (params)=>{
+    // 处理表单查询操作
+    // TODO：将参数传递到后端进行查询
+    handleFilter = (params) => {
         this.params = params;
         this.requestList();
     }
-    requestList = ()=>{
-        let _this = this;
-        axios.ajax({
-            url:'/order/list',
-            data:{
-                params: this.params
-            }
-        }).then((res)=>{
-            let list = res.result.item_list.map((item, index) => {
-                item.key = index;
-                return item;
-            });
-            this.setState({
-                list,
-                pagination: Utils.pagination(res, (current) => {
-                    _this.params.page = current;
-                    _this.requestList();
-                })
-            })
-        })
+
+    requestList = () => {
+        axios.requestList(this, '/order/list', this.params, true);
     }
-    // 订单结束确认
-    handleConfirm = ()=>{
+
+    // 点击订单结束按钮触发的事件
+    handleConfirm = () => {
         let item = this.state.selectedItem;
         if (!item) {
             Modal.info({
@@ -75,25 +61,27 @@ export default class Order extends React.Component{
             })
             return;
         }
+        // 这里进行一次AJAX请求的原因是为了获取对应订单的信息，但我觉得可以省略这次请求，直接从第一次获得的请求中提取数据。
         axios.ajax({
-            url:'/order/ebike_info',
-            data:{
-                params:{
+            url: '/order/ebike_info',
+            data: {
+                params: {
                     orderId: item.id
                 }
             }
-        }).then((res)=>{
-            if(res.code ==0 ){
+        }).then((res) => {
+            if (res.code == 0) {
                 this.setState({
-                    orderInfo:res.result,
+                    orderInfo: res.result,
                     orderConfirmVisble: true
                 })
             }
         })
     }
 
-    // 结束订单
-    handleFinishOrder = ()=>{
+    // 点击结束订单按钮后，提交弹出的表单所触发的事件
+    // TODO：与后端进行同步，在数据库中删除对应的订单信息
+    handleFinishOrder = () => {
         let item = this.state.selectedItem;
         axios.ajax({
             url: '/order/finish_order',
@@ -112,6 +100,8 @@ export default class Order extends React.Component{
             }
         })
     }
+    // 点击表格中某一行时，能够使改行被选中
+    // TODO：点击表格前的单选按钮会被选中，需要修复一下这个BUG
     onRowClick = (record, index) => {
         let selectKey = [index];
         this.setState({
@@ -120,7 +110,8 @@ export default class Order extends React.Component{
         })
     }
 
-    openOrderDetail = ()=>{
+    // 点击订单详情触发的事件
+    openOrderDetail = () => {
         let item = this.state.selectedItem;
         if (!item) {
             Modal.info({
@@ -130,13 +121,15 @@ export default class Order extends React.Component{
             return;
         }
         // 打开新窗口
-        window.open(`/#/common/order/detail/${item.id}`,'_blank')
+        // TODO：对新窗口的处理
+        window.open(`/#/common/order/detail/${item.id}`, '_blank')
     }
-    render(){
+
+    render() {
         const columns = [
             {
-                title:'订单编号',
-                dataIndex:'order_sn'
+                title: '订单编号',
+                dataIndex: 'order_sn'
             },
             {
                 title: '车辆编号',
@@ -153,8 +146,8 @@ export default class Order extends React.Component{
             {
                 title: '里程',
                 dataIndex: 'distance',
-                render(distance){
-                    return distance/1000 + 'Km';
+                render(distance) {
+                    return distance / 1000 + 'Km';
                 }
             },
             {
@@ -183,8 +176,8 @@ export default class Order extends React.Component{
             }
         ]
         const formItemLayout = {
-            labelCol:{span:5},
-            wrapperCol:{span:19}
+            labelCol: { span: 5 },
+            wrapperCol: { span: 19 }
         }
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
@@ -194,11 +187,11 @@ export default class Order extends React.Component{
         return (
             <div>
                 <Card>
-                    <BaseForm formList={this.formList} filterSubmit={this.handleFilter}/>
+                    <BaseForm formList={this.formList} filterSubmit={this.handleFilter} />
                 </Card>
-                <Card style={{marginTop:10}}>
+                <Card style={{ marginTop: 10 }}>
                     <Button type="primary" onClick={this.openOrderDetail}>订单详情</Button>
-                    <Button type="primary" style={{marginLeft:10}} onClick={this.handleConfirm}>结束订单</Button>
+                    <Button type="primary" style={{ marginLeft: 10 }} onClick={this.handleConfirm}>结束订单</Button>
                 </Card>
                 <div className="content-wrap">
                     <Table
@@ -219,9 +212,9 @@ export default class Order extends React.Component{
                 <Modal
                     title="结束订单"
                     visible={this.state.orderConfirmVisble}
-                    onCancel={()=>{
+                    onCancel={() => {
                         this.setState({
-                            orderConfirmVisble:false
+                            orderConfirmVisble: false
                         })
                     }}
                     onOk={this.handleFinishOrder}

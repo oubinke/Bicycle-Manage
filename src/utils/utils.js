@@ -52,6 +52,7 @@ export default {
         number += '';
         return number.replace(/(\d{3})\d*(\d{4})/g, '$1***********$2')
     },
+    // 将输入的数组转换为<Opting>组件
     getOptionList(data){
         if(!data){
             return [];

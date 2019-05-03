@@ -1,36 +1,37 @@
 import React from 'react'
-import { Input, Select, Form, Button, Checkbox, Radio, DatePicker} from 'antd'
+import { Input, Select, Form, Button, Checkbox, Radio, DatePicker } from 'antd'
 import Utils from '../../utils/utils';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class FilterForm extends React.Component{
+// 城市管理和订单管理页面都有一个**查询表单**，将这两个页面的查询表单所对应的特性提取出来，变成一个新的组件。
+class FilterForm extends React.Component {
 
-    handleFilterSubmit = ()=>{
+    handleFilterSubmit = () => {
         let fieldsValue = this.props.form.getFieldsValue();
         this.props.filterSubmit(fieldsValue);
     }
 
-    reset = ()=>{
+    reset = () => {
         this.props.form.resetFields();
     }
 
-    initFormList = ()=>{
+    initFormList = () => {
         const { getFieldDecorator } = this.props.form;
         const formList = this.props.formList;
         const formItemList = [];
-        if (formList && formList.length>0){
-            formList.forEach((item,i)=>{
+        if (formList && formList.length > 0) {
+            formList.forEach((item, i) => {
                 let label = item.label;
                 let field = item.field;
                 let initialValue = item.initialValue || '';
                 let placeholder = item.placeholder;
                 let width = item.width;
-                if (item.type == '时间查询'){
+                if (item.type == '时间查询') {
                     const begin_time = <FormItem label="订单时间" key={field}>
                         {
                             getFieldDecorator('begin_time')(
-                                <DatePicker showTime={true} placeholder={placeholder} format="YYYY-MM-DD HH:mm:ss"/>
+                                <DatePicker showTime={true} placeholder={placeholder} format="YYYY-MM-DD HH:mm:ss" />
                             )
                         }
                     </FormItem>;
@@ -43,10 +44,10 @@ class FilterForm extends React.Component{
                         }
                     </FormItem>;
                     formItemList.push(end_time)
-                }else if(item.type == 'INPUT'){
+                } else if (item.type == 'INPUT') {
                     const INPUT = <FormItem label={label} key={field}>
                         {
-                            getFieldDecorator([field],{
+                            getFieldDecorator([field], {
                                 initialValue: initialValue
                             })(
                                 <Input type="text" placeholder={placeholder} />
@@ -89,10 +90,11 @@ class FilterForm extends React.Component{
         }
         return formItemList;
     }
-    render(){
+
+    render() {
         return (
             <Form layout="inline">
-                { this.initFormList() }
+                {this.initFormList()}
                 <FormItem>
                     <Button type="primary" style={{ margin: '0 20px' }} onClick={this.handleFilterSubmit}>查询</Button>
                     <Button onClick={this.reset}>重置</Button>
