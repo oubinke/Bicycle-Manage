@@ -1,25 +1,29 @@
-import React from 'react'
-import Utils from '../../utils/utils'
-import { Table } from 'antd'
-import "./index.less"
+import React from 'react';
+import Utils from '../../utils/utils';
+import { Table } from 'antd';
+import "./index.less";
 
+// TODO：完成复选框逻辑的梳理
 export default class ETable extends React.Component {
 
     state = {}
     //处理行点击事件
     onRowClick = (record, index) => {
         let rowSelection = this.props.rowSelection;
+        // 多选框 OR 单选框
         if (rowSelection == 'checkbox') {
-            let selectedRowKeys = this.props.selectedRowKeys;
+            let selectedRowKeys = this.props.selectedRowKeys || [];
             let selectedIds = this.props.selectedIds;
             let selectedItem = this.props.selectedItem || [];
             if (selectedIds) {
                 const i = selectedIds.indexOf(record.id);
-                if (i == -1) {//避免重复添加
+                // 如果点击的行在点击前没有被选中，那么就选中它
+                if (i == -1) {
                     selectedIds.push(record.id)
                     selectedRowKeys.push(index);
                     selectedItem.push(record);
                 } else {
+                    // 如果点击的行在点击前被选中了，那么就反选它
                     selectedIds.splice(i, 1);
                     selectedRowKeys.splice(i, 1);
                     selectedItem.splice(i, 1);
@@ -33,39 +37,40 @@ export default class ETable extends React.Component {
         } else {
             let selectKey = [index];
             const selectedRowKeys = this.props.selectedRowKeys;
+            // 如果当前行已经被选中，则反选
             if (selectedRowKeys && selectedRowKeys[0] == index) {
-                return;
+                selectKey = [];
+                record = [];
             }
-            this.props.updateSelectedItem(selectKey, record || {});
+            console.log('record', record, ',index', index)
+            this.props.updateSelectedItem(selectKey, [record]);
         }
     };
 
-    // 选择框变更
+    // 处理按钮点击事件
     onSelectChange = (selectedRowKeys, selectedRows) => {
         let rowSelection = this.props.rowSelection;
         const selectedIds = [];
+        // 如果是多选框
         if (rowSelection == 'checkbox') {
             selectedRows.map((item) => {
                 selectedIds.push(item.id);
             });
-            this.setState({
-                selectedRowKeys,
-                selectedIds: selectedIds,
-                selectedItem: selectedRows[0]
-            });
         }
-        this.props.updateSelectedItem(selectedRowKeys, selectedRows[0], selectedIds);
+        this.props.updateSelectedItem(selectedRowKeys, selectedRows, selectedIds);
     };
 
-    onSelectAll = (selected, selectedRows, changeRows) => {
-        let selectedIds = [];
-        let selectKey = [];
-        selectedRows.forEach((item, i) => {
-            selectedIds.push(item.id);
-            selectKey.push(i);
-        });
-        this.props.updateSelectedItem(selectKey, selectedRows[0] || {}, selectedIds);
-    }
+    // 选择所有行的回调。
+    // onSelectAll = (selected, selectedRows, changeRows) => {
+    //     console.log(selectedRows);
+    //     let selectedIds = [];
+    //     let selectKey = [];
+    //     selectedRows.forEach((item, i) => {
+    //         selectedIds.push(item.id);
+    //         selectKey.push(i);
+    //     });
+    //     this.props.updateSelectedItem(selectKey, selectedRows[0] || {}, selectedIds);
+    // }
 
     getOptions = () => {
         let p = this.props;
@@ -83,7 +88,7 @@ export default class ETable extends React.Component {
         };
         if (p.columns && p.columns.length > 0) {
             p.columns.forEach((item) => {
-                //开始/结束 时间
+                //设置每一列的宽度
                 if (!item.title) {
                     return
                 }
@@ -108,21 +113,19 @@ export default class ETable extends React.Component {
         const rowSelection = {
             type: 'radio',
             selectedRowKeys,
+            // 点击表格中某一行的单选按钮触发的事件
             onChange: this.onSelectChange,
-            onSelect: (record, selected, selectedRows) => {
-                console.log('...')
-            },
-            onSelectAll: this.onSelectAll
+            // onSelectAll: this.onSelectAll
         };
         let row_selection = this.props.rowSelection;
         // 当属性未false或者null时，说明没有单选或者复选列
         if (row_selection === false || row_selection === null) {
             row_selection = false;
         } else if (row_selection == 'checkbox') {
-            //设置类型未复选框
+            //设置类型为复选框
             rowSelection.type = 'checkbox';
         } else {
-            //默认未单选
+            //默认为单选
             row_selection = 'radio';
         }
         return <Table
@@ -130,6 +133,7 @@ export default class ETable extends React.Component {
             bordered
             {...this.props}
             rowSelection={row_selection ? rowSelection : null}
+            // 点击表格中某一行触发的事件
             onRow={(record, index) => ({
                 onClick: () => {
                     if (!row_selection) {
@@ -140,6 +144,7 @@ export default class ETable extends React.Component {
             })}
         />
     };
+
     render = () => {
         return (
             <div>

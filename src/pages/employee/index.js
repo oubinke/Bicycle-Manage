@@ -1,9 +1,11 @@
-import React from 'react'
-import { Card, Button, Table, Form, Input, Checkbox, Select, Radio, Icon, message, Modal, DatePicker } from 'antd'
-import axios from '../../axios/index'
-import Utils from '../../utils/utils'
-import ETable from '../../components/ETable/index'
-import Moment from 'moment'
+import React from 'react';
+import { Card, Button, Table, Form, Input, Checkbox, Select, Radio, Icon, message, Modal, DatePicker } from 'antd';
+import axios from '../../axios/index';
+import Utils from '../../utils/utils';
+import ETable from '../../components/ETable/index';
+import Moment from 'moment';
+import BaseForm from '../../components/BaseForm';
+
 const FormItem = Form.Item;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
@@ -18,6 +20,23 @@ export default class User extends React.Component {
     params = {
         page: 1
     }
+
+    formList = [
+        {
+            type: 'INPUT',
+            label: '用户名',
+            field: 'user_name',
+            placeholder: '请输入用户名',
+            width: 80,
+        },
+        {
+            type: 'INPUT',
+            label: '手机号',
+            field: 'user_mobile',
+            placeholder: '请输入手机号',
+            width: 80,
+        }
+    ]
 
     requestList = () => {
         axios.requestList(this, '/table/list1', this.params, true);
@@ -44,6 +63,13 @@ export default class User extends React.Component {
     }
 
     componentDidMount() {
+        this.requestList();
+    }
+
+    // 处理表单查询操作
+    // TODO：将参数传递到后端进行查询
+    handleFilter = (params) => {
+        this.params = params;
         this.requestList();
     }
 
@@ -183,19 +209,8 @@ export default class User extends React.Component {
         ];
         return (
             <div>
-                {/* 这个为什么需要一个登陆表单*/}
                 <Card>
-                    <Form layout="inline">
-                        <FormItem>
-                            <Input placeholder="请输入用户名" />
-                        </FormItem>
-                        <FormItem>
-                            <Input type="password" placeholder="请输入密码" />
-                        </FormItem>
-                        <FormItem>
-                            <Button type="primary">登 录</Button>
-                        </FormItem>
-                    </Form>
+                    <BaseForm formList={this.formList} filterSubmit={this.handleFilter} />
                 </Card>
                 <Card style={{ marginTop: 10 }} className="operator-wrap">
                     <Button type="primary" icon="plus" onClick={() => this.handleOperator('create')}>创建员工</Button>
@@ -210,6 +225,9 @@ export default class User extends React.Component {
                         selectedRowKeys={this.state.selectedRowKeys}
                         dataSource={this.state.list}
                         pagination={this.state.pagination}
+                        /* rowSelection={'checkbox'} */
+                        selectedIds={this.state.selectedIds}
+                        selectedItem={this.state.selectedItem}
                     />
                 </div>
                 <Modal

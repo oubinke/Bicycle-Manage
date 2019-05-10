@@ -1,8 +1,7 @@
 import React from 'react';
-import { Card, Button, Table, Form, Select, Modal, DatePicker, message } from 'antd'
-import axios from '../../axios'
-import Utils from '../../utils/utils'
-import BaseForm from '../../components/BaseForm'
+import { Card, Button, Table, Form, Select, Modal, DatePicker, message } from 'antd';
+import axios from '../../axios';
+import BaseForm from '../../components/BaseForm';
 const FormItem = Form.Item;
 
 export default class Order extends React.Component {
@@ -61,7 +60,7 @@ export default class Order extends React.Component {
             })
             return;
         }
-        // 这里进行一次AJAX请求的原因是为了获取对应订单的信息，但我觉得可以省略这次请求，直接从第一次获得的请求中提取数据。
+        // 这里进行一次AJAX请求的原因是为了获取对应订单的详细信息
         axios.ajax({
             url: '/order/ebike_info',
             data: {
@@ -69,7 +68,7 @@ export default class Order extends React.Component {
                     orderId: item.id
                 }
             }
-        }).then((res) => {
+        }, true).then((res) => {
             if (res.code == 0) {
                 this.setState({
                     orderInfo: res.result,
@@ -100,14 +99,13 @@ export default class Order extends React.Component {
             }
         })
     }
-    // 点击表格中某一行时，能够使改行被选中
-    // TODO：点击表格前的单选按钮会被选中，需要修复一下这个BUG
+    // 点击表格中某一行时，能够使该行被选中
     onRowClick = (record, index) => {
         let selectKey = [index];
         this.setState({
             selectedRowKeys: selectKey,
             selectedItem: record
-        })
+        });
     }
 
     // 点击订单详情触发的事件
@@ -182,7 +180,13 @@ export default class Order extends React.Component {
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
             type: 'radio',
-            selectedRowKeys
+            selectedRowKeys,
+            onChange: (selectedRowKeys, selectedRows) => {
+                this.setState({
+                    selectedRowKeys: selectedRowKeys,
+                    selectedItem: selectedRows
+                });
+            }
         }
         return (
             <div>
@@ -203,7 +207,6 @@ export default class Order extends React.Component {
                         onRow={(record, index) => {
                             return {
                                 onClick: () => {
-                                    this.onRowClick(record, index);
                                 }
                             };
                         }}

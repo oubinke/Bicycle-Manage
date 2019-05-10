@@ -69,6 +69,7 @@ export default {
      * @param {*选中行对象} selectedItem
      */
     updateSelectedItem(selectedRowKeys, selectedRows, selectedIds) {
+        // 对于多选框，需要一个selectedIds来作为选中的唯一标识
         if (selectedIds) {
             this.setState({
                 selectedRowKeys,
@@ -76,6 +77,7 @@ export default {
                 selectedItem: selectedRows
             })
         } else {
+            // 对于单选框
             this.setState({
                 selectedRowKeys,
                 selectedItem: selectedRows

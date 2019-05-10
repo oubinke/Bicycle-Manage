@@ -16,6 +16,7 @@ export default class Axios {
         }, isMock).then((data) => {
             if (data && data.result) {
                 let list;
+                // 注意返回数据名称的不同
                 if (data.result.list) {
                     list = data.result.list.map((item, index) => {
                         item.key = index;
