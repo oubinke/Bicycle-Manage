@@ -9,6 +9,7 @@ import NoMatch from './pages/nomatch'
 import City from "./pages/city";
 import Order from "./pages/order";
 import Employee from "./pages/employee";
+import BicycleMap from "./pages/map";
 
 export default class IRouter extends React.Component {
     render() {
@@ -24,6 +25,7 @@ export default class IRouter extends React.Component {
                                 <Route path="/city" component={City} />
                                 <Route path="/order" component={Order} />
                                 <Route path="/employee" component={Employee} />
+                                <Route path="/bikemap" component={BicycleMap} />
                                 <Route component={NoMatch} />
                             </Switch>
                         </Admin>

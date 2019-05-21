@@ -35,8 +35,9 @@ class FilterForm extends React.Component {
                             )
                         }
                     </FormItem>;
-                    formItemList.push(begin_time)
-                    const end_time = <FormItem label="~" colon={false} key={field}>
+                    formItemList.push(begin_time);
+                    const latterField = field + '1';
+                    const end_time = <FormItem label="~" colon={false} key={latterField}>
                         {
                             getFieldDecorator('end_time')(
                                 <DatePicker showTime={true} placeholder={placeholder} format="YYYY-MM-DD HH:mm:ss" />
