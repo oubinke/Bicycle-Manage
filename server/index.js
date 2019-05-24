@@ -11,5 +11,6 @@ handle['.svg'] = requestHandles.getSvg;
 handle['.png'] = requestHandles.getPng;
 handle['.jpg'] = requestHandles.getJpg;
 handle['/open_city'] = requestHandles.query;
+handle['/open_city/open'] = requestHandles.create;
 
 server.start(router.route, handle);

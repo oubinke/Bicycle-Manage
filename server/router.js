@@ -8,12 +8,11 @@ module.exports = {
         var pathname = url.parse(inputUrl).pathname;
         // 请求资源的扩展名
         var extname = path.extname(path.basename(pathname));
-        var queryString = url.parse(inputUrl).query;
         // 根据不同的请求路径来执行不同的处理
         if (typeof handle[pathname] === 'function') {
             // 例如'/', '/manifest.json', '/open_city?page=1'等的请求
             console.log('According pathname Handle ' + pathname);
-            handle[pathname](response, queryString);
+            handle[pathname](response, inputUrl);
         } else if (typeof handle[extname] === 'function') {
             // 例如'/static/js/main.7404934f.chunk.js', '/assets/end_point.png'等的请求
             console.log('According extname Handle ' + pathname);
