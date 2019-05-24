@@ -42,7 +42,7 @@ export default class ETable extends React.Component {
                 selectKey = [];
                 record = [];
             }
-            console.log('record', record, ',index', index)
+            // console.log('record', record, ',index', index)
             this.props.updateSelectedItem(selectKey, [record]);
         }
     };

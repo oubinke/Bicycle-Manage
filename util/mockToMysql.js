@@ -2,7 +2,8 @@ var https = require('https');
 var saveData = require('./storeDataToMysql');
 
 // 从指定url获取数据
-var requestUrl = 'https://www.easy-mock.com/mock/5cb5d9425ea1070405312b0f/api/open_city';
+var requestUrl = 'https://www.easy-mock.com/mock/5cb5d9425ea1070405312b0f/api/employee';
+var tableName = requestUrl.substring(requestUrl.lastIndexOf('/') + 1);
 https.get(requestUrl, function (response) {
     var body = [];
 
@@ -17,6 +18,6 @@ https.get(requestUrl, function (response) {
         body = Buffer.concat(body);
         // console.log(body.toString());
         // 将请求到的数据存储至MySQL
-        saveData.storeDataToMysql(body.toString());
+        saveData.storeDataToMysql(body.toString(), tableName);
     });
 });

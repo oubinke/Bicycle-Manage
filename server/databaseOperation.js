@@ -6,6 +6,7 @@ var database = require('./database');
 var connection = database.connection;
 connection.connect();
 
+// 查询数据库中相应表的所有内容
 function select(response, queryUrl) {
     // 根据传入的参数获得数据库中需要查询的表名
     var tableName = url.parse(queryUrl).pathname.slice(1);
@@ -17,10 +18,8 @@ function select(response, queryUrl) {
         console.log('tableName ' + tableName);
         // SQL命令：获得数据库指定表中所有的条目
         var sql = 'SELECT * FROM ' + tableName;
-        // SQL命令：获得数据库指定表中项目的总数
-        var sqlCheckNum = 'SELECT COUNT(*) AS total FROM ' + tableName;
         var data = {};
-        connection.query(sql + ';' + sqlCheckNum, function (err, result) {
+        connection.query(sql, function (err, result) {
             if (err) {
                 console.log('[SELECT ERROR] - ', err.message);
                 return;
@@ -30,9 +29,9 @@ function select(response, queryUrl) {
             data['result'] = {};
             data['result']['page'] = +pageNum;
             data['result']['page_size'] = 10;
-            data['result']['total_count'] = result[1][0].total;
+            data['result']['total_count'] = result.length;
             data['result']['page_count'] = Math.ceil(data['result']['total_count'] / data['result']['page_size']);
-            data['result']['item_list'] = result[0];
+            data['result']['item_list'] = result;
             response.writeHead(200, {
                 'Content-Type': 'application/json; charset=utf-8',
                 'Access-Control-Allow-Origin': '*'
@@ -90,6 +89,7 @@ function select(response, queryUrl) {
     // connection.end();
 }
 
+// 在数据库某一个表中插入一项
 function create(response, createUrl) {
     var queryString = url.parse(createUrl).query;
     var queryObject = querystring.parse(queryString);
@@ -123,12 +123,30 @@ function create(response, createUrl) {
             'Content-Type': 'application/json; charset=utf-8',
             'Access-Control-Allow-Origin': '*'
         });
-        var data = {code: '0'};
+        var data = { code: '0' };
         response.end(JSON.stringify(data));
+    });
+}
+
+// 在数据库中某一表中更新一项
+
+function update(response, createUrl) {
+    var queryString = decodeURI(url.parse(createUrl).query);
+    var queryObject = querystring.parse(queryString);
+    var tableName = /\/(\w+)\//.exec(createUrl)[1];
+
+    var sql = 'UPDATE ' + tableName + ' SET name = ' + '"' + queryObject.name + '"' + ', sex = ' + queryObject.sex +',phone_num=' + queryObject.phone_num + ',identify_num=' + queryObject.identify_num +' WHERE id = ' + queryObject.id;
+    console.log(sql);
+    connection.query(sql, function (err, result, fields) {
+        if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return;
+        }
     });
 }
 
 module.exports = {
     select: select,
-    create: create
+    create: create,
+    update: update
 }

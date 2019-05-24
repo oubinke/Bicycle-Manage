@@ -106,7 +106,7 @@ function getJpg(pathname, extname, response) {
 
 
 function query(response, queryUrl) {
-    console.log('Handle ' + queryUrl);
+    console.log('Handle query ' + queryUrl);
     databaseOperation.select(response, queryUrl);
     // response.writeHead(200, {
     //     'Content-Type': 'application/json; charset=utf-8',
@@ -116,8 +116,13 @@ function query(response, queryUrl) {
 }
 
 function create(response, createUrl) {
-    console.log('Handle ' + createUrl);
+    console.log('Handle create ' + createUrl);
     databaseOperation.create(response, createUrl);
+}
+
+function update(response, createUrl) {
+    console.log('Handle update ' + createUrl);
+    databaseOperation.update(response, createUrl);
 }
 
 module.exports = {
@@ -129,5 +134,6 @@ module.exports = {
     getPng: getPng,
     getJpg: getJpg,
     query: query,
-    create: create
+    create: create,
+    update: update
 }

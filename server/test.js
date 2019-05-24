@@ -24,14 +24,6 @@ var city_name = {
     2: "天津",
     3: "上海"
 };
-var mode = {
-    1: 1,
-    2: 2
-};
-var op_mode = {
-    1: 1,
-    2: 2
-};
 
 var sql = 'INSERT INTO ' + tableName + '(name, mode, op_mode, franchisee_name, city_admins, open_time, sys_user_name, update_time) VALUES(?,?,?,?,?,?,?,?)';
 var sqlParams = [];

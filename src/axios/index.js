@@ -67,6 +67,7 @@ export default class Axios {
             baseApi = 'http://localhost:8888';
             // baseApi = 'https://www.easy-mock.com/mock/5cb5d9425ea1070405312b0f/api';
         }
+        console.log(options.data);
         return new Promise((resolve, reject) => {
             axios({
                 url: options.url,

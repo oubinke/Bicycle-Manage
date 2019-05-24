@@ -12,5 +12,7 @@ handle['.png'] = requestHandles.getPng;
 handle['.jpg'] = requestHandles.getJpg;
 handle['/open_city'] = requestHandles.query;
 handle['/open_city/open'] = requestHandles.create;
+handle['/employee'] = requestHandles.query;
+handle['/employee/update'] = requestHandles.update;
 
 server.start(router.route, handle);
