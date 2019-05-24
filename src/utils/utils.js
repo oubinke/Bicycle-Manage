@@ -3,23 +3,34 @@ import { Select } from 'antd'
 const Option = Select.Option;
 
 export default {
+    // 格式化时间
     formateDate(time) {
-        if(!time) return '';
-        let date = new Date(time);
-        return date.getFullYear() + '-' + (date.getMonth()+1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+        // console.log(time);
+        if (!time) return '';
+        if (typeof time === 'number') { 
+            let date = new Date(time);
+            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+        } else { // 1994-07-19T19:56:36.000Z
+            console.log(time);
+            var arr = time.split('');
+            arr.splice(time.indexOf('.'));
+            arr.splice(time.indexOf('T'), 1, ' ');
+            return arr.join('');
+        }
     },
-    pagination(data,callback){
+    // 分页
+    pagination(data, callback) {
         return {
-            onChange:(current)=>{
+            onChange: (current) => {
                 callback(current)
             },
-            current:data.result.page,
-            pageSize:data.result.page_size,
+            current: data.result.page,
+            pageSize: data.result.page_size,
             total: data.result.total_count,
-            showTotal:()=>{
+            showTotal: () => {
                 return `共${data.result.total_count}条`
             },
-            showQuickJumper:true
+            showQuickJumper: true
         }
     },
     // 格式化金额,单位:分(eg:430分=4.30元)
@@ -53,12 +64,12 @@ export default {
         return number.replace(/(\d{3})\d*(\d{4})/g, '$1***********$2')
     },
     // 将输入的数组转换为<Opting>组件
-    getOptionList(data){
-        if(!data){
+    getOptionList(data) {
+        if (!data) {
             return [];
         }
         let options = [] //[<Option value="0" key="all_key">全部</Option>];
-        data.map((item)=>{
+        data.map((item) => {
             options.push(<Option value={item.id} key={item.id}>{item.name}</Option>)
         })
         return options;

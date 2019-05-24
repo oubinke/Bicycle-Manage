@@ -70,7 +70,7 @@ export default class City extends React.Component {
 
     // 默认请求我们的接口数据
     requestList = () => {
-        axios.requestList(this, '/open_city', this.params, true);
+        axios.requestList(this, '/open_city', this.params, false);
         // let _this = this;
         // axios.ajax({
         //     url: '/open_city',
@@ -106,12 +106,12 @@ export default class City extends React.Component {
         let cityInfo = this.cityForm.props.form.getFieldsValue();
         console.log(cityInfo);
         axios.ajax({
-            url: '/city/open',
+            url: '/open_city/open',
             data: {
                 params: cityInfo
             }
         }).then((res) => {
-            if (res.code == '0') {
+            if (res.code === '0') {
                 message.success('开通成功');
                 this.setState({
                     isShowOpenCity: false
@@ -148,14 +148,16 @@ export default class City extends React.Component {
                 title: '城市管理员',
                 dataIndex: 'city_admins',
                 // 这里要渲染的是一个数组对象，需要把数组转换为基本数据类型。
-                render(arr) {
-                    return arr.map((item) => {
-                        return item.user_name;
-                    }).join(',');
-                }
+                // render(arr) {
+                //     return arr.map((item) => {
+                //         return item.user_name;
+                //     }).join(',');
+                // }
             }, {
                 title: '城市开通时间',
-                dataIndex: 'open_time'
+                dataIndex: 'open_time',
+                // 从数据库读取出来的时间格式为1994-07-19T19:56:36.000Z，需要去掉T和Z
+                render: Utils.formateDate
             }, {
                 title: '操作时间',
                 dataIndex: 'update_time',
@@ -215,13 +217,14 @@ class OpenCityForm extends React.Component {
             <Form layout="horizontal">
                 <FormItem label="选择城市" {...formItemLayout}>
                     {
-                        getFieldDecorator('city_id', {
+                        getFieldDecorator('name', {
                             initialValue: '1'
                         })(
                             <Select style={{ width: 100 }}>
                                 <Option value="">全部</Option>
                                 <Option value="1">北京市</Option>
                                 <Option value="2">天津市</Option>
+                                <Option value="3">上海市</Option>
                             </Select>
                         )
                     }
@@ -240,12 +243,23 @@ class OpenCityForm extends React.Component {
                 </FormItem>
                 <FormItem label="用车模式" {...formItemLayout}>
                     {
-                        getFieldDecorator('use_mode', {
+                        getFieldDecorator('mode', {
                             initialValue: '1'
                         })(
                             <Select style={{ width: 100 }}>
                                 <Option value="1">指定停车点</Option>
                                 <Option value="2">禁停区</Option>
+                            </Select>
+                        )
+                    }
+                </FormItem>
+                <FormItem label="操作人" {...formItemLayout}>
+                    {
+                        getFieldDecorator('sys_user_name', {
+                            initialValue: 'Bingo'
+                        })(
+                            <Select style={{ width: 100 }}>
+                                <Option value="Bingo">Bingo</Option>
                             </Select>
                         )
                     }
