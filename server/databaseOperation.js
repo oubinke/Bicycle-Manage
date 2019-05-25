@@ -91,29 +91,57 @@ function select(response, queryUrl) {
 
 // 在数据库某一个表中插入一项
 function create(response, createUrl) {
-    var queryString = url.parse(createUrl).query;
+    var queryString = encodeURI(url.parse(createUrl).query);
     var queryObject = querystring.parse(queryString);
     var tableName = /\/(\w+)\//.exec(createUrl)[1];
 
-    var city_name = {
-        1: "北京",
-        2: "天津",
-        3: "上海"
+    var createSql = {
+        'open_city': 'INSERT INTO ' + tableName + '(name, mode, op_mode, franchisee_name, city_admins, open_time, sys_user_name, update_time) VALUES(?,?,?,?,?,?,?,?)',
+        'employee': 'INSERT INTO ' + tableName + '(name, sex, isMarried, phone_num, identify_num, address) VALUES(?,?,?,?,?,?)',
     };
 
-    var sql = 'INSERT INTO ' + tableName + '(name, mode, op_mode, franchisee_name, city_admins, open_time, sys_user_name, update_time) VALUES(?,?,?,?,?,?,?,?)';
-    var sqlParams = [];
-    sqlParams.push(city_name[queryObject['name']]);
-    sqlParams.push(+queryObject['mode']);
-    sqlParams.push(+queryObject['op_mode']);
-    sqlParams.push('松果自营');
-    sqlParams.push(queryObject['sys_user_name']);
-    var date = new Date();
-    var open_time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
-    sqlParams.push(open_time);
-    sqlParams.push(queryObject['sys_user_name']);
-    sqlParams.push(new Date().getTime());
+    var createSqlParams = {
+        'open_city': getCityParams,
+        'employee': getEmployeeParams
+    };
 
+    function getCityParams() {
+        var city_name = {
+            1: "北京",
+            2: "天津",
+            3: "上海"
+        };
+        var sqlParams = [];
+        sqlParams.push(city_name[queryObject['name']]);
+        sqlParams.push(+queryObject['mode']);
+        sqlParams.push(+queryObject['op_mode']);
+        sqlParams.push('松果自营');
+        sqlParams.push(queryObject['sys_user_name']);
+        var date = new Date();
+        var open_time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
+        sqlParams.push(open_time);
+        sqlParams.push(queryObject['sys_user_name']);
+        sqlParams.push(new Date().getTime());
+
+        return sqlParams;
+    }
+
+    function getEmployeeParams() {
+        var sqlParams = [];
+        sqlParams.push(queryObject['name']);
+        sqlParams.push(+queryObject['sex']);
+        sqlParams.push(queryObject['phone_num']);
+        sqlParams.push(queryObject['identify_num']);
+        sqlParams.push(queryObject['address']);
+
+        return sqlParams;
+    }
+
+    var sql = createSql[tableName];
+    var sqlParams = createSqlParams[tableName]();
+    console.log(sql);
+    console.log(sqlParams);
+    return;
     connection.query(sql, sqlParams, function (err, result, fields) {
         if (err) {
             console.log('[SELECT ERROR] - ', err.message);
@@ -129,19 +157,25 @@ function create(response, createUrl) {
 }
 
 // 在数据库中某一表中更新一项
-
 function update(response, createUrl) {
+    // 注意这里要使用decodeURI对url进行解码
     var queryString = decodeURI(url.parse(createUrl).query);
     var queryObject = querystring.parse(queryString);
     var tableName = /\/(\w+)\//.exec(createUrl)[1];
 
-    var sql = 'UPDATE ' + tableName + ' SET name = ' + '"' + queryObject.name + '"' + ', sex = ' + queryObject.sex +',phone_num=' + queryObject.phone_num + ',identify_num=' + queryObject.identify_num +' WHERE id = ' + queryObject.id;
+    var sql = 'UPDATE ' + tableName + ' SET name = ' + '"' + queryObject.name + '"' + ', sex = ' + queryObject.sex + ',phone_num=' + queryObject.phone_num + ',identify_num=' + queryObject.identify_num + ' WHERE id = ' + queryObject.id;
     console.log(sql);
     connection.query(sql, function (err, result, fields) {
         if (err) {
             console.log('[SELECT ERROR] - ', err.message);
             return;
         }
+        response.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*'
+        });
+        var data = { code: '0' };
+        response.end(JSON.stringify(data));
     });
 }
 

@@ -131,7 +131,14 @@ export default class User extends React.Component {
     handleSubmit = () => {
         let type = this.state.type;
         let employeeInfo = this.userForm.props.form.getFieldsValue();
-        employeeInfo.id = this.state.userInfo.id;
+        if (type === 'detail') {
+            this.setState({
+                isVisible: false,
+            });
+            return;
+        } else if (type === 'edit') {
+            employeeInfo.id = this.state.userInfo.id;
+        }
         axios.ajax({
             url: type == 'create' ? '/employee/insert' : '/employee/update',
             data: {
@@ -140,7 +147,8 @@ export default class User extends React.Component {
         }).then((res) => {
             if (res.code == 0) {
                 this.setState({
-                    isVisible: false
+                    isVisible: false,
+                    selectedRowKeys: []
                 })
                 this.requestList();
             }
@@ -237,8 +245,15 @@ class UserForm extends React.Component {
         };
         // 对于||来说，如果第一个操作数的求值结果为false，则返回第二个操作符
         // 当type为create时，this.props.userInfo为undefined，将其转换为一个空对象，保证后面不会报错
-        const userInfo = this.props.userInfo || {};
+        // const userInfo = this.props.userInfo || {};
         const type = this.props.type;
+        var userInfo;
+        if (type === 'create') {
+            userInfo = {};
+        } else {
+            userInfo = this.props.userInfo;
+        }
+
         return (
             <Form layout="horizontal">
                 <FormItem label="姓名" {...formItemLayout}>
