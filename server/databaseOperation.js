@@ -10,7 +10,7 @@ connection.connect();
 function select(response, queryUrl) {
     // 根据传入的参数获得数据库中需要查询的表名
     var tableName = url.parse(queryUrl).pathname.slice(1);
-    var queryString = url.parse(queryUrl).query;
+    var queryString = url.parse(decodeURI(queryUrl)).query;
     var queryObject = querystring.parse(queryString);
     // 如果是请求整个页面
     if (queryObject['page'] && Object.keys(queryObject).length === 1) {
@@ -39,32 +39,41 @@ function select(response, queryUrl) {
             response.end(JSON.stringify(data));
         });
     } else { // 根据特定关键字进行查询
-        var city_name = {
-            0: '',
-            1: ' name = "北京"',
-            2: ' name = "天津"',
-            2: ' name = "上海"'
-        };
-        var mode = {
-            0: '',
-            1: ' mode = 1',
-            2: ' mode = 2'
-        };
-        var op_mode = {
-            0: '',
-            1: ' op_mode = 1',
-            2: ' op_mode = 2'
-        };
-        sql_city_name = city_name[queryObject['city']];
-        sql_mode = mode[queryObject['mode']];
-        sql_op_mode = op_mode[queryObject['op_mode']];
-        var sql = 'SELECT * FROM ' + tableName;
-        sql = sql + (queryObject['city'] === '0' ? '' : ' WHERE') + city_name[queryObject['city']];
-        sql = sql + (queryObject['mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE')) + mode[queryObject['mode']];
-        sql = sql + (queryObject['mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE')) + op_mode[queryObject['op_mode']];
-        console.log('Query the database by : city_name:', sql_city_name, ' mode:', sql_mode, ' op_mode:', sql_op_mode);
+        console.log(tableName);
         var data = {};
-        var pageNum = queryObject['page'];
+        var sql = 'SELECT * FROM ' + tableName;
+        if (tableName === 'open_city') {
+            var city_name = {
+                0: '',
+                1: ' name = "北京"',
+                2: ' name = "天津"',
+                2: ' name = "上海"'
+            };
+            var mode = {
+                0: '',
+                1: ' mode = 1',
+                2: ' mode = 2'
+            };
+            var op_mode = {
+                0: '',
+                1: ' op_mode = 1',
+                2: ' op_mode = 2'
+            };
+            sql_city_name = city_name[queryObject['city']];
+            sql_mode = mode[queryObject['mode']];
+            sql_op_mode = op_mode[queryObject['op_mode']];
+            sql = sql + (queryObject['city'] === '0' ? '' : ' WHERE') + city_name[queryObject['city']];
+            sql = sql + (queryObject['mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE')) + mode[queryObject['mode']];
+            sql = sql + (queryObject['mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE')) + op_mode[queryObject['op_mode']];
+            console.log('Query the database by : city_name:', sql_city_name, ' mode:', sql_mode, ' op_mode:', sql_op_mode);
+        } else if (tableName === 'employee') {
+            sql_name = queryObject['name'];
+            sql_phone_num = queryObject['phone_num'];
+            sql += sql_name === '' ? '' : ' WHERE name = ' + '"' + sql_name + '"';
+            sql += sql_phone_num === '' ? '' : ((sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE') + ' phone_num = ' + '"' + sql_phone_num + '"');
+            console.log(sql);
+            
+        }
         connection.query(sql, function (err, result) {
             if (err) {
                 console.log('[SELECT ERROR] - ', err.message);
@@ -73,7 +82,7 @@ function select(response, queryUrl) {
             // 初始化要发送给客户端的数据
             data['code'] = 0;
             data['result'] = {};
-            data['result']['page'] = +pageNum;
+            data['result']['page'] = +queryObject['page'];
             data['result']['page_size'] = 10;
             data['result']['total_count'] = result.length;
             data['result']['page_count'] = Math.ceil(data['result']['total_count'] / data['result']['page_size']);
@@ -91,7 +100,7 @@ function select(response, queryUrl) {
 
 // 在数据库某一个表中插入一项
 function create(response, createUrl) {
-    var queryString = encodeURI(url.parse(createUrl).query);
+    var queryString = url.parse(decodeURI(createUrl)).query;
     var queryObject = querystring.parse(queryString);
     var tableName = /\/(\w+)\//.exec(createUrl)[1];
 
@@ -130,6 +139,7 @@ function create(response, createUrl) {
         var sqlParams = [];
         sqlParams.push(queryObject['name']);
         sqlParams.push(+queryObject['sex']);
+        sqlParams.push(+queryObject['isMarried']);
         sqlParams.push(queryObject['phone_num']);
         sqlParams.push(queryObject['identify_num']);
         sqlParams.push(queryObject['address']);
@@ -141,7 +151,6 @@ function create(response, createUrl) {
     var sqlParams = createSqlParams[tableName]();
     console.log(sql);
     console.log(sqlParams);
-    return;
     connection.query(sql, sqlParams, function (err, result, fields) {
         if (err) {
             console.log('[SELECT ERROR] - ', err.message);
@@ -159,11 +168,31 @@ function create(response, createUrl) {
 // 在数据库中某一表中更新一项
 function update(response, createUrl) {
     // 注意这里要使用decodeURI对url进行解码
-    var queryString = decodeURI(url.parse(createUrl).query);
+    var queryString = url.parse(decodeURI(createUrl)).query;
     var queryObject = querystring.parse(queryString);
     var tableName = /\/(\w+)\//.exec(createUrl)[1];
 
-    var sql = 'UPDATE ' + tableName + ' SET name = ' + '"' + queryObject.name + '"' + ', sex = ' + queryObject.sex + ',phone_num=' + queryObject.phone_num + ',identify_num=' + queryObject.identify_num + ' WHERE id = ' + queryObject.id;
+    var sql = 'UPDATE ' + tableName + ' SET name = ' + '"' + queryObject.name + '"' + ', sex = ' + queryObject.sex + ',phone_num=' + queryObject.phone_num + ',identify_num=' + queryObject.identify_num + ',address=' + '"' + queryObject.address + '"' + ' WHERE id = ' + queryObject.id;
+    console.log(sql);
+    connection.query(sql, function (err, result, fields) {
+        if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return;
+        }
+        response.writeHead(200, {
+            'Content-Type': 'application/json; charset=utf-8',
+            'Access-Control-Allow-Origin': '*'
+        });
+        var data = { code: '0' };
+        response.end(JSON.stringify(data));
+    });
+}
+
+function dele(response, createUrl) {
+    var queryString = url.parse(createUrl).query;
+    var queryObject = querystring.parse(queryString);
+    var tableName = /\/(\w+)\//.exec(createUrl)[1];
+    var sql = 'DELETE FROM ' + tableName + ' WHERE id = ' + queryObject.id;
     console.log(sql);
     connection.query(sql, function (err, result, fields) {
         if (err) {
@@ -182,5 +211,6 @@ function update(response, createUrl) {
 module.exports = {
     select: select,
     create: create,
-    update: update
+    update: update,
+    delete: dele
 }

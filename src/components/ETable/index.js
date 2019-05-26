@@ -37,12 +37,14 @@ export default class ETable extends React.Component {
         } else {
             let selectKey = [index];
             const selectedRowKeys = this.props.selectedRowKeys;
+            console.log('selectedRowKeys: ', selectedRowKeys);
             // 如果当前行已经被选中，则反选
             if (selectedRowKeys && selectedRowKeys[0] == index) {
                 selectKey = [];
                 record = [];
             }
-            // console.log('record', record, ',index', index)
+            // console.log('selectKey: ', selectKey, ',record:', record);
+            // console.log('-----------------------------------');
             this.props.updateSelectedItem(selectKey, [record]);
         }
     };

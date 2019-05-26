@@ -24,15 +24,15 @@ export default class User extends React.Component {
     formList = [
         {
             type: 'INPUT',
-            label: '用户名',
-            field: 'user_name',
-            placeholder: '请输入用户名',
+            label: '员工姓名',
+            field: 'name',
+            placeholder: '请输入姓名',
             width: 80,
         },
         {
             type: 'INPUT',
             label: '手机号',
-            field: 'user_mobile',
+            field: 'phone_num',
             placeholder: '请输入手机号',
             width: 80,
         }
@@ -109,10 +109,10 @@ export default class User extends React.Component {
                 content: '确定要删除此用户吗？',
                 onOk: () => {
                     axios.ajax({
-                        url: '/user/delete',
+                        url: '/employee/delete',
                         data: {
                             params: {
-                                id: item.id
+                                id: item[0].id
                             }
                         }
                     }).then((res) => {
@@ -276,6 +276,18 @@ class UserForm extends React.Component {
                                 <RadioGroup>
                                     <Radio value={1}>男</Radio>
                                     <Radio value={2}>女</Radio>
+                                </RadioGroup>
+                            )}
+                </FormItem>
+                <FormItem label="婚姻状态" {...formItemLayout}>
+                    {
+                        userInfo && type == 'detail' ? (userInfo.isMarried == 0 ? '未婚' : '已婚') :
+                            getFieldDecorator('isMarried', {
+                                initialValue: userInfo.isMarried
+                            })(
+                                <RadioGroup>
+                                    <Radio value={0}>未婚</Radio>
+                                    <Radio value={1}>已婚</Radio>
                                 </RadioGroup>
                             )}
                 </FormItem>

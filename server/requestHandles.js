@@ -125,6 +125,11 @@ function update(response, createUrl) {
     databaseOperation.update(response, createUrl);
 }
 
+function dele(response, createUrl) {
+    console.log('Handle delete ' + createUrl);
+    databaseOperation.delete(response, createUrl);
+}
+
 module.exports = {
     start: start,
     manifest: manifest,
@@ -135,5 +140,6 @@ module.exports = {
     getJpg: getJpg,
     query: query,
     create: create,
-    update: update
+    update: update,
+    delete: dele
 }
