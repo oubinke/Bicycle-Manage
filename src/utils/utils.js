@@ -4,19 +4,21 @@ const Option = Select.Option;
 
 export default {
     // 格式化时间
-    formateDate(time) {
+    formateDate() {
         // console.log(time);
-        if (!time) return '';
-        if (typeof time === 'number') { 
-            let date = new Date(time);
-            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
-        } else { // 1994-07-19T19:56:36.000Z
-            console.log(time);
-            var arr = time.split('');
-            arr.splice(time.indexOf('.'));
-            arr.splice(time.indexOf('T'), 1, ' ');
-            return arr.join('');
+        var date = new Date();
+        var time = {
+            Y: date.getFullYear(),
+            M: date.getMonth() + 1,
+            D: date.getDate(),
+            h: date.getHours(),
+            m: date.getMinutes(),
+            s: date.getSeconds()
+        };
+        for (var key in time) {
+            time[key] = time[key] < 10 ? ('0' + time[key]) : time[key];
         }
+        return time.Y + '-' + time.M + '-' + time.D + ' ' + time.h + ':' + time.m + ':' + time.s;
     },
     // 分页
     pagination(data, callback) {
@@ -76,8 +78,8 @@ export default {
     },
     /**
      * ETable 行点击通用函数
-     * @param {*选中行的索引} selectedRowKeys
-     * @param {*选中行对象} selectedItem
+     * @param {*选中行的索引} selectedRowKeys 是一个数组
+     * @param {*选中行对象} selectedItem 是一个数组
      */
     updateSelectedItem(selectedRowKeys, selectedRows, selectedIds) {
         // 对于多选框，需要一个selectedIds来作为选中的唯一标识

@@ -121,6 +121,7 @@ export default class User extends React.Component {
                                 isVisible: false
                             })
                             this.requestList();
+                            this.state.selectedRowKeys = [];
                         }
                     })
                 }

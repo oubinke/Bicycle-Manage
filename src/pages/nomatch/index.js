@@ -1,9 +1,11 @@
 import React from 'react';
+import './index.less';
+
 export default class NoMatch extends React.Component {
-    render () {
+    render() {
         return (
-            <div style={{textAlign:'center', fontSize:'24'}}>
-                404 Not Found
+            <div className='notfound-wrap'>
+                正在开发，敬请期待~
             </div>
         );
     }

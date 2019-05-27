@@ -1,11 +1,11 @@
 import React from 'react';
-import './index.less'
+import './index.less';
 
 export default class Footer extends React.Component {
     render() {
         return (
             <div className="footer">
-            版权所有：慕课网&河畔一角（推荐使用谷歌浏览器，可以获得更佳操作页面体验） 技术支持：河畔一角
+            Copyright ©2019-2029 版权所有 保留一切权利 | 隐私政策 | 法律声明 | 京B2-20080267 | 京ICP备05100288号  | 中国
             </div>
         );
     }

@@ -30,8 +30,8 @@ class FilterForm extends React.Component {
                 if (item.type == '时间查询') {
                     const begin_time = <FormItem label="订单时间" key={field}>
                         {
-                            getFieldDecorator('begin_time')(
-                                <DatePicker showTime={true} placeholder={placeholder} format="YYYY-MM-DD HH:mm:ss" />
+                            getFieldDecorator('start_time')(
+                                <DatePicker placeholder={placeholder}/>
                             )
                         }
                     </FormItem>;
@@ -40,7 +40,7 @@ class FilterForm extends React.Component {
                     const end_time = <FormItem label="~" colon={false} key={latterField}>
                         {
                             getFieldDecorator('end_time')(
-                                <DatePicker showTime={true} placeholder={placeholder} format="YYYY-MM-DD HH:mm:ss" />
+                                <DatePicker placeholder={placeholder}/>
                             )
                         }
                     </FormItem>;

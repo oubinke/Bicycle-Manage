@@ -35,11 +35,11 @@ export default class ETable extends React.Component {
             }
             this.props.updateSelectedItem(selectedRowKeys, selectedItem || {}, selectedIds);
         } else {
-            let selectKey = [index];
+            let page = this.props.pagination.current;
+            let selectKey = [(page - 1) * 10 + index];
             const selectedRowKeys = this.props.selectedRowKeys;
-            console.log('selectedRowKeys: ', selectedRowKeys);
             // 如果当前行已经被选中，则反选
-            if (selectedRowKeys && selectedRowKeys[0] == index) {
+            if (selectedRowKeys && selectedRowKeys[0] == selectKey[0]) {
                 selectKey = [];
                 record = [];
             }
@@ -59,6 +59,7 @@ export default class ETable extends React.Component {
                 selectedIds.push(item.id);
             });
         }
+        console.log('selectedRowKeys', selectedRowKeys, 'selectedRows', selectedRows);
         this.props.updateSelectedItem(selectedRowKeys, selectedRows, selectedIds);
     };
 
@@ -133,7 +134,9 @@ export default class ETable extends React.Component {
         return <Table
             className="card-wrap page-table"
             bordered
-            {...this.props}
+            columns={this.props.columns}
+            dataSource={this.props.dataSource}
+            pagination={this.props.pagination}
             rowSelection={row_selection ? rowSelection : null}
             // 点击表格中某一行触发的事件
             onRow={(record, index) => ({

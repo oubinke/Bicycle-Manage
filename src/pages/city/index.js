@@ -45,15 +45,6 @@ export default class City extends React.Component {
             initialValue: '0',
             width: 80,
             list: [{ id: '0', name: '全部' }, { id: '1', name: '自营' }, { id: '2', name: '加盟' }]
-        },
-        {
-            type: 'SELECT',
-            label: '加盟商授权状态',
-            field: 'auth_status',
-            placeholder: '全部',
-            initialValue: '0',
-            width: 100,
-            list: [{ id: '0', name: '全部' }, { id: '1', name: '已授权' }, { id: '2', name: '未授权' }]
         }
     ]
 
@@ -62,7 +53,6 @@ export default class City extends React.Component {
     }
 
     // 处理表单查询操作
-    // TODO：将参数传递到后端进行查询
     handleFilter = (params) => {
         this.params = params;
         this.requestList();
@@ -157,11 +147,9 @@ export default class City extends React.Component {
                 title: '城市开通时间',
                 dataIndex: 'open_time',
                 // 从数据库读取出来的时间格式为1994-07-19T19:56:36.000Z，需要去掉T和Z
-                render: Utils.formateDate
             }, {
                 title: '操作时间',
                 dataIndex: 'update_time',
-                render: Utils.formateDate
             }, {
                 title: '操作人',
                 dataIndex: 'sys_user_name'

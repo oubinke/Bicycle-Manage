@@ -2,6 +2,9 @@ import React from 'react';
 import { Card, Button, Table, Form, Select, Modal, DatePicker, message } from 'antd';
 import axios from '../../axios';
 import BaseForm from '../../components/BaseForm';
+import Utils from './../../utils/utils';
+import ETable from '../../components/ETable/index';
+
 const FormItem = Form.Item;
 
 export default class Order extends React.Component {
@@ -14,26 +17,24 @@ export default class Order extends React.Component {
     }
     formList = [
         {
-            type: 'SELECT',
-            label: '城市',
-            field: 'city',
-            placeholder: '全部',
-            initialValue: '0',
-            width: 80,
-            list: [{ id: '0', name: '全部' }, { id: '1', name: '北京' }, { id: '2', name: '天津' }, { id: '3', name: '上海' }]
+            type: 'INPUT',
+            label: '订单编号',
+            field: 'order_num',
+            placeholder: '请输入订单编号',
+            width: 100
         },
         {
             type: '时间查询',
-            field: 'time'
-        },
-        {
+            field: 'time',
+            placeholder: '请选择日期'
+        }, {
             type: 'SELECT',
             label: '订单状态',
             field: 'order_status',
             placeholder: '全部',
-            initialValue: '0',
+            initialValue: '',
             width: 80,
-            list: [{ id: '0', name: '全部' }, { id: '1', name: '进行中' }, { id: '2', name: '结束行程' }]
+            list: [{ id: '', name: '全部' }, { id: '0', name: '进行中' }, { id: '1', name: '结束行程' }]
         }
     ]
     componentDidMount() {
@@ -41,98 +42,77 @@ export default class Order extends React.Component {
     }
 
     // 处理表单查询操作
-    // TODO：将参数传递到后端进行查询
     handleFilter = (params) => {
+        // 表单返回的时间都为 moment 对象，所以在提交服务器前需要预处理。
+        params.start_time = params.start_time ? params.start_time.format('YYYY-MM-DD') : '';
+        params.end_time = params.end_time ? params.end_time.format('YYYY-MM-DD') : '';
         this.params = params;
+
+        console.log(params);
         this.requestList();
     }
 
     requestList = () => {
-        axios.requestList(this, '/order/list', this.params, true);
+        axios.requestList(this, '/order_info', this.params, false);
     }
 
     // 点击订单结束按钮触发的事件
-    handleConfirm = () => {
+    handleFinishOrder = () => {
         let item = this.state.selectedItem;
-        if (!item) {
+        console.log('item', item);
+        if (item === [] || !item ) {
             Modal.info({
                 title: '信息',
                 content: '请选择一条订单进行结束'
             })
             return;
         }
-        // 这里进行一次AJAX请求的原因是为了获取对应订单的详细信息
-        axios.ajax({
-            url: '/order/ebike_info',
-            data: {
-                params: {
-                    orderId: item.id
-                }
-            }
-        }, true).then((res) => {
-            if (res.code == 0) {
-                this.setState({
-                    orderInfo: res.result,
-                    orderConfirmVisble: true
-                })
-            }
-        })
-    }
-
-    // 点击结束订单按钮后，提交弹出的表单所触发的事件
-    // TODO：与后端进行同步，在数据库中删除对应的订单信息
-    handleFinishOrder = () => {
-        let item = this.state.selectedItem;
-        axios.ajax({
-            url: '/order/finish_order',
-            data: {
-                params: {
-                    orderId: item.id
-                }
-            }
-        }).then((res) => {
-            if (res.code == 0) {
-                message.success('订单结束成功')
-                this.setState({
-                    orderConfirmVisble: false
-                })
-                this.requestList();
-            }
-        })
-    }
-    // 点击表格中某一行时，能够使该行被选中
-    onRowClick = (record, index) => {
-        let selectKey = [index];
-        this.setState({
-            selectedRowKeys: selectKey,
-            selectedItem: record
-        });
-    }
-
-    // 点击订单详情触发的事件
-    openOrderDetail = () => {
-        let item = this.state.selectedItem;
-        if (!item) {
+        if (item[0].order_status === 1) {
             Modal.info({
                 title: '信息',
-                content: '请先选择一条订单'
+                content: '该订单已结束，请选择其它订单'
             })
             return;
         }
-        // 打开新窗口
-        // TODO：对新窗口的处理
-        window.open(`/#/common/order/detail/${item.id}`, '_blank')
+        axios.ajax({
+            url: '/order_info/finish',
+            data: {
+                params: {
+                    order_num: item[0].order_num
+                }
+            }
+        }, false).then((res) => {
+            if (res.code == 0) {
+                message.success('订单结束成功')
+            }
+            this.requestList();
+        })
     }
+
+    // 点击订单详情触发的事件
+    // openOrderDetail = () => {
+    //     let item = this.state.selectedItem;
+    //     if (!item) {
+    //         Modal.info({
+    //             title: '信息',
+    //             content: '请先选择一条订单'
+    //         })
+    //         return;
+    //     }
+    //     // 打开新窗口
+    //     // TODO：对新窗口的处理
+    //     window.open(`/#/common/order/detail/${item.id}`, '_blank')
+    // }
 
     render() {
         const columns = [
             {
                 title: '订单编号',
-                dataIndex: 'order_sn'
+                dataIndex: 'order_num'
             },
             {
                 title: '车辆编号',
-                dataIndex: 'bike_sn'
+                dataIndex: 'bike_num'
             },
             {
                 title: '用户名',
@@ -140,65 +120,64 @@ export default class Order extends React.Component {
             },
             {
                 title: '手机号',
-                dataIndex: 'mobile'
+                dataIndex: 'phone_num'
             },
             {
-                title: '里程',
+                title: '行驶距离(公里)',
                 dataIndex: 'distance',
                 render(distance) {
-                    return distance / 1000 + 'Km';
+                    return distance ? Math.ceil(distance / 1000) : null;
                 }
             },
             {
-                title: '行驶时长',
+                title: '行驶时长(分钟)',
                 dataIndex: 'total_time'
             },
             {
-                title: '状态',
-                dataIndex: 'status'
+                title: '订单状态',
+                dataIndex: 'order_status',
+                render(order_status) {
+                    return order_status === 0 ? '进行中' : '已结束';
+                }
             },
             {
                 title: '开始时间',
-                dataIndex: 'start_time'
+                dataIndex: 'start_time',
             },
             {
                 title: '结束时间',
-                dataIndex: 'end_time'
+                dataIndex: 'end_time',
             },
             {
-                title: '订单金额',
+                title: '订单金额(元)',
                 dataIndex: 'total_fee'
-            },
-            {
-                title: '实付金额',
-                dataIndex: 'user_pay'
             }
         ]
         const formItemLayout = {
             labelCol: { span: 5 },
             wrapperCol: { span: 19 }
         }
-        const selectedRowKeys = this.state.selectedRowKeys;
-        const rowSelection = {
-            type: 'radio',
-            selectedRowKeys,
-            onChange: (selectedRowKeys, selectedRows) => {
-                this.setState({
-                    selectedRowKeys: selectedRowKeys,
-                    selectedItem: selectedRows
-                });
-            }
-        }
+        // const selectedRowKeys = this.state.selectedRowKeys;
+        // const rowSelection = {
+        //     type: 'radio',
+        //     selectedRowKeys,
+        //     onChange: (selectedRowKeys, selectedRows) => {
+        //         this.setState({
+        //             selectedRowKeys: selectedRowKeys,
+        //             selectedItem: selectedRows
+        //         });
+        //     }
+        // }
         return (
             <div>
                 <Card>
                     <BaseForm formList={this.formList} filterSubmit={this.handleFilter} />
                 </Card>
                 <Card style={{ marginTop: 10 }}>
-                    <Button type="primary" onClick={this.openOrderDetail}>订单详情</Button>
-                    <Button type="primary" style={{ marginLeft: 10 }} onClick={this.handleConfirm}>结束订单</Button>
+                    {/* <Button type="primary" onClick={this.openOrderDetail}>订单详情</Button> */}
+                    <Button type="primary" style={{ marginLeft: 10 }} onClick={this.handleFinishOrder}>结束订单</Button>
                 </Card>
-                <div className="content-wrap">
+                {/* <div className="content-wrap">
                     <Table
                         bordered
                         columns={columns}
@@ -212,33 +191,19 @@ export default class Order extends React.Component {
                             };
                         }}
                     />
+                </div> */}
+                <div className="content-wrap">
+                    <ETable
+                        columns={columns}
+                        updateSelectedItem={Utils.updateSelectedItem.bind(this)}
+                        selectedRowKeys={this.state.selectedRowKeys}
+                        dataSource={this.state.list}
+                        pagination={this.state.pagination}
+                        /* rowSelection={'checkbox'} */
+                        selectedIds={this.state.selectedIds}
+                        selectedItem={this.state.selectedItem}
+                    />
                 </div>
-                <Modal
-                    title="结束订单"
-                    visible={this.state.orderConfirmVisble}
-                    onCancel={() => {
-                        this.setState({
-                            orderConfirmVisble: false
-                        })
-                    }}
-                    onOk={this.handleFinishOrder}
-                    width={600}
-                >
-                    <Form layout="horizontal">
-                        <FormItem label="车辆编号" {...formItemLayout}>
-                            {this.state.orderInfo.bike_sn}
-                        </FormItem>
-                        <FormItem label="剩余电量" {...formItemLayout}>
-                            {this.state.orderInfo.battery + '%'}
-                        </FormItem>
-                        <FormItem label="行程开始时间" {...formItemLayout}>
-                            {this.state.orderInfo.start_time}
-                        </FormItem>
-                        <FormItem label="当前位置" {...formItemLayout}>
-                            {this.state.orderInfo.location}
-                        </FormItem>
-                    </Form>
-                </Modal>
             </div>
         );
     }

@@ -1,6 +1,7 @@
 var url = require('url');
 var querystring = require('querystring');
 var database = require('./database');
+var util = require('./util');
 
 // 连接数据库
 var connection = database.connection;
@@ -39,7 +40,7 @@ function select(response, queryUrl) {
             response.end(JSON.stringify(data));
         });
     } else { // 根据特定关键字进行查询
-        console.log(tableName);
+        console.log('tableName ' + tableName);
         var data = {};
         var sql = 'SELECT * FROM ' + tableName;
         if (tableName === 'open_city') {
@@ -47,7 +48,7 @@ function select(response, queryUrl) {
                 0: '',
                 1: ' name = "北京"',
                 2: ' name = "天津"',
-                2: ' name = "上海"'
+                3: ' name = "上海"'
             };
             var mode = {
                 0: '',
@@ -59,20 +60,37 @@ function select(response, queryUrl) {
                 1: ' op_mode = 1',
                 2: ' op_mode = 2'
             };
-            sql_city_name = city_name[queryObject['city']];
-            sql_mode = mode[queryObject['mode']];
-            sql_op_mode = op_mode[queryObject['op_mode']];
-            sql = sql + (queryObject['city'] === '0' ? '' : ' WHERE') + city_name[queryObject['city']];
-            sql = sql + (queryObject['mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE')) + mode[queryObject['mode']];
-            sql = sql + (queryObject['mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE')) + op_mode[queryObject['op_mode']];
-            console.log('Query the database by : city_name:', sql_city_name, ' mode:', sql_mode, ' op_mode:', sql_op_mode);
+            var sql_city_name = city_name[queryObject['city']];
+            var sql_mode = mode[queryObject['mode']];
+            var sql_op_mode = op_mode[queryObject['op_mode']];
+            sql += queryObject['city'] === '0' ? '' : (' WHERE' + city_name[queryObject['city']]);
+            sql += queryObject['mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE' + mode[queryObject['mode']]);
+            sql += queryObject['op_mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE' + op_mode[queryObject['op_mode']]);
+            console.log(sql);
         } else if (tableName === 'employee') {
-            sql_name = queryObject['name'];
-            sql_phone_num = queryObject['phone_num'];
+            var sql_name = queryObject['name'];
+            var sql_phone_num = queryObject['phone_num'];
             sql += sql_name === '' ? '' : ' WHERE name = ' + '"' + sql_name + '"';
             sql += sql_phone_num === '' ? '' : ((sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE') + ' phone_num = ' + '"' + sql_phone_num + '"');
             console.log(sql);
-            
+
+        } else if (tableName === 'order_info') {
+            var sql_order_num = queryObject['order_num'];
+            var sql_start_time = queryObject['start_time'];
+            var sql_end_time = queryObject['end_time'];
+            var sql_order_status = queryObject['order_status'];
+
+            sql += sql_order_num === '' ? '' : ' WHERE order_num = ' + '"' + sql_order_num + '"';
+            if (sql_start_time) {
+                sql += ((sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE') + ' Date(start_time) BETWEEN ' + '"' + sql_start_time + '"');
+                if (!sql_end_time) {
+                    var now = new Date();
+                    sql_end_time = now.getFullYear() + '-' + now.getMonth() + '-' + now.getDay();
+                }
+                sql += ' AND ' + '"' + sql_end_time + '"';
+            }
+            sql += sql_order_status === '' ? '' : ((sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE') + ' order_status = ' + '"' + sql_order_status + '"');
+            console.log(sql);
         }
         connection.query(sql, function (err, result) {
             if (err) {
@@ -126,11 +144,9 @@ function create(response, createUrl) {
         sqlParams.push(+queryObject['op_mode']);
         sqlParams.push('松果自营');
         sqlParams.push(queryObject['sys_user_name']);
-        var date = new Date();
-        var open_time = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes() + ':' + date.getSeconds();
-        sqlParams.push(open_time);
+        sqlParams.push(util.getFormatTime());
         sqlParams.push(queryObject['sys_user_name']);
-        sqlParams.push(new Date().getTime());
+        sqlParams.push(util.getFormatTime());
 
         return sqlParams;
     }
@@ -172,8 +188,19 @@ function update(response, createUrl) {
     var queryObject = querystring.parse(queryString);
     var tableName = /\/(\w+)\//.exec(createUrl)[1];
 
-    var sql = 'UPDATE ' + tableName + ' SET name = ' + '"' + queryObject.name + '"' + ', sex = ' + queryObject.sex + ',phone_num=' + queryObject.phone_num + ',identify_num=' + queryObject.identify_num + ',address=' + '"' + queryObject.address + '"' + ' WHERE id = ' + queryObject.id;
+    var total_time = 10 + Math.floor(Math.random() * 20);
+    var end_time = util.getFormatTime();
+    var total_fee = 1 + Math.floor(Math.random() * 7);
+    var distance = 1000 + Math.floor(Math.random() * 4000);
+
+    var updateSql = {
+        'employee': 'UPDATE ' + tableName + ' SET name = ' + '"' + queryObject.name + '"' + ', sex = ' + queryObject.sex + ',isMarried=' + queryObject.isMarried + ',phone_num=' + queryObject.phone_num + ',identify_num=' + queryObject.identify_num + ',address=' + '"' + queryObject.address + '"' + ' WHERE id = ' + queryObject.id,
+        'order_info': 'UPDATE ' + tableName + ' SET total_time = ' + total_time + ', end_time = ' + '"' + end_time + '"' + ', total_fee = ' + total_fee + ', distance = ' + distance + ', order_status = 1 WHERE order_num = ' + '"' + queryObject.order_num + '"'
+    };
+    var sql = updateSql[tableName];
     console.log(sql);
+
+
     connection.query(sql, function (err, result, fields) {
         if (err) {
             console.log('[SELECT ERROR] - ', err.message);

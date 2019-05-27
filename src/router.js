@@ -1,10 +1,9 @@
 import React from 'react'
 import { HashRouter, Route, Switch } from 'react-router-dom';
-import Home from './home';
+import Home from './pages/home';
 import App from './App';
 import Login from './pages/login'
 import Admin from './admin'
-import Buttons from './pages/ui/buttons'
 import NoMatch from './pages/nomatch'
 import City from "./pages/city";
 import Order from "./pages/order";
@@ -21,7 +20,6 @@ export default class IRouter extends React.Component {
                         <Admin>
                             <Switch>
                                 <Route path="/home" component={Home} />
-                                <Route path="/ui/buttons" component={Buttons} />
                                 <Route path="/city" component={City} />
                                 <Route path="/order" component={Order} />
                                 <Route path="/employee" component={Employee} />

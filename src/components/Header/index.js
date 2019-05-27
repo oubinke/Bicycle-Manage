@@ -11,7 +11,7 @@ export default class Header extends React.Component {
             userName: 'Bingo'
         })
         setInterval(() => {
-            let sysTime = Util.formateDate(new Date().getTime());
+            let sysTime = Util.formateDate();
             this.setState({
                 sysTime
             })

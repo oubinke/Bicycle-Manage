@@ -2,7 +2,7 @@ var https = require('https');
 var saveData = require('./storeDataToMysql');
 
 // 从指定url获取数据
-var requestUrl = 'https://www.easy-mock.com/mock/5cb5d9425ea1070405312b0f/api/employee';
+var requestUrl = 'https://www.easy-mock.com/mock/5cb5d9425ea1070405312b0f/api/order_info';
 var tableName = requestUrl.substring(requestUrl.lastIndexOf('/') + 1);
 https.get(requestUrl, function (response) {
     var body = [];
