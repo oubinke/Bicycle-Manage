@@ -81,7 +81,7 @@ function select(response, queryUrl) {
         data['result']['total_count'] = result.length;
         data['result']['page_count'] = Math.ceil(data['result']['total_count'] / data['result']['page_size']);
         data['result']['item_list'] = result;
-        console.log(data);
+        // console.log(data);
         response.writeHead(200, {
             'Content-Type': 'application/json; charset=utf-8',
             'Access-Control-Allow-Origin': '*'

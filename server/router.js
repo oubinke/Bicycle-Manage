@@ -11,11 +11,11 @@ module.exports = {
         // 根据不同的请求路径来执行不同的处理
         if (typeof handle[pathname] === 'function') {
             // 例如'/', '/manifest.json', '/open_city?page=1'等请求的处理
-            console.log('According pathname Handle ' + pathname);
+            console.log('Handle path: ' + pathname);
             handle[pathname](response, inputUrl);
         } else if (typeof handle[extname] === 'function') {
             // 例如'/static/js/main.7404934f.chunk.js', '/assets/end_point.png'等请求静态资源的处理
-            console.log('According extname Handle ' + pathname);
+            console.log('Handle path: ' + pathname);
             handle[extname](pathname, extname, response);
         } else {
             console.log('Not found ' + pathname);
