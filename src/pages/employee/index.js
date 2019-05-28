@@ -3,11 +3,9 @@ import { Card, Button, Table, Form, Input, Checkbox, Select, Radio, Icon, messag
 import axios from '../../axios/index';
 import Utils from '../../utils/utils';
 import ETable from '../../components/ETable/index';
-import Moment from 'moment';
 import BaseForm from '../../components/BaseForm';
 
 const FormItem = Form.Item;
-const Option = Select.Option;
 const RadioGroup = Radio.Group;
 
 
@@ -40,26 +38,6 @@ export default class User extends React.Component {
 
     requestList = () => {
         axios.requestList(this, '/employee', this.params, false);
-        // axios.ajax({
-        //     url: '/table/list1',
-        //     data: {
-        //         params: {
-        //             page: this.params.page
-        //         }
-        //     }
-        // }, true).then((res) => {
-        //     let _this = this;
-        //     this.setState({
-        //         list: res.result.list.map((item, index) => {
-        //             item.key = index
-        //             return item;
-        //         }),
-        //         pagination: Utils.pagination(res, (current) => {
-        //             _this.params.page = current;
-        //             _this.requestList();
-        //         })
-        //     })
-        // })
     }
 
     componentDidMount() {
@@ -67,7 +45,6 @@ export default class User extends React.Component {
     }
 
     // 处理表单查询操作
-    // TODO：将参数传递到后端进行查询
     handleFilter = (params) => {
         this.params = params;
         this.requestList();

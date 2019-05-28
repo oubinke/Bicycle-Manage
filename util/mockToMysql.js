@@ -1,3 +1,7 @@
+/**
+ * 将mock生成的数据导入到MySQL中
+ */
+
 var https = require('https');
 var saveData = require('./storeDataToMysql');
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import MenuConfig from '../../config/menuConfig';
-import { Menu, Icon } from 'antd';
+import { Menu} from 'antd';
 import './index.less'
 import { NavLink } from 'react-router-dom'
 

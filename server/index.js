@@ -3,6 +3,8 @@ var router = require('./router');
 var requestHandles = require('./requestHandles');
 
 var handle = {};
+
+//根据客户端不同的url来进行不同的处理
 handle['/'] = requestHandles.start;
 handle['/manifest.json'] = requestHandles.manifest;
 handle['.js'] = requestHandles.getJs;
@@ -21,6 +23,6 @@ handle['/employee'] = requestHandles.query;
 handle['/employee/insert'] = requestHandles.create;
 handle['/employee/update'] = requestHandles.update;
 handle['/employee/delete'] = requestHandles.delete;
-// 
+
 
 server.start(router.route, handle);

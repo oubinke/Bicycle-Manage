@@ -1,5 +1,4 @@
 import React from 'react';
-import Utils from '../../utils/utils';
 import { Table } from 'antd';
 import "./index.less";
 

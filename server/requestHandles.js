@@ -14,6 +14,7 @@ var MIME = {
     '.jpg': 'image/jpeg'
 };
 
+// '/'请求对应的处理
 function start(response) {
     var pathname = path.join(root, 'index.html');
     fs.readFile(pathname, function (err, data) {
@@ -26,6 +27,7 @@ function start(response) {
     });
 }
 
+// '/manifest.json'请求对应的处理
 function manifest(response) {
     var pathname = path.join(root, 'manifest.json');
     fs.readFile(pathname, function (err, data) {
@@ -38,6 +40,7 @@ function manifest(response) {
     });
 }
 
+// 获得以.js结尾的静态文件
 function getJs(pathname, extname, response) {
     pathname = path.join(root, pathname);
     fs.readFile(pathname, function (err, data) {
@@ -50,6 +53,7 @@ function getJs(pathname, extname, response) {
     });
 }
 
+// 获得以.css结尾的静态文件
 function getCss(pathname, extname, response) {
     pathname = path.join(root, pathname);
     fs.readFile(pathname, function (err, data) {
@@ -62,6 +66,7 @@ function getCss(pathname, extname, response) {
     });
 }
 
+// 获得以.svg结尾的静态文件
 function getSvg(pathname, extname, response) {
     pathname = path.join(root, pathname);
     fs.readFile(pathname, "binary", function (error, file) {
@@ -76,6 +81,7 @@ function getSvg(pathname, extname, response) {
     });
 }
 
+// 获得以.png结尾的静态文件
 function getPng(pathname, extname, response) {
     pathname = path.join(root, pathname);
     fs.readFile(pathname, "binary", function (error, file) {
@@ -90,6 +96,7 @@ function getPng(pathname, extname, response) {
     });
 }
 
+// 获得以.jpg结尾的静态文件
 function getJpg(pathname, extname, response) {
     pathname = path.join(root, pathname);
     fs.readFile(pathname, "binary", function (error, file) {
@@ -104,27 +111,25 @@ function getJpg(pathname, extname, response) {
     });
 }
 
-
+// 查询数据库中的内容
 function query(response, queryUrl) {
     console.log('Handle query ' + queryUrl);
     databaseOperation.select(response, queryUrl);
-    // response.writeHead(200, {
-    //     'Content-Type': 'application/json; charset=utf-8',
-    //     'Access-Control-Allow-Origin': '*'
-    // });
-    // response.end(JSON.stringify(data));
 }
 
+// 往数据库中添加内容
 function create(response, createUrl) {
     console.log('Handle create ' + createUrl);
     databaseOperation.create(response, createUrl);
 }
 
+// 更新数据库中的内容
 function update(response, createUrl) {
     console.log('Handle update ' + createUrl);
     databaseOperation.update(response, createUrl);
 }
 
+// 删除数据库中的内容
 function dele(response, createUrl) {
     console.log('Handle delete ' + createUrl);
     databaseOperation.delete(response, createUrl);

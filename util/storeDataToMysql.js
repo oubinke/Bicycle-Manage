@@ -1,3 +1,7 @@
+/**
+ * 将mock生成的数据导入到MySQL不同的表中
+ */
+
 var mysql = require('mysql');
 var connection = mysql.createConnection({
     host: 'localhost',

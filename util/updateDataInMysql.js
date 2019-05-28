@@ -1,3 +1,7 @@
+/**
+ * easymock所生成的一些数据不符合要求，需要进行更新
+ */
+
 var mysql = require('mysql');
 var Mock = require('mockjs');
 
@@ -60,6 +64,7 @@ function updatePhoneAndID(id, tableName) {
     });
 }
 
+// 生成随机的电话号码
 function getPhoneNum() {
     var prefixArray = new Array("130", "131", "132", "133", "135", "137", "138", "170", "187", "189");
     var i = parseInt(10 * Math.random());
@@ -70,6 +75,7 @@ function getPhoneNum() {
     return prefix;
 }
 
+// 数据库中order_info表，phone_num列的内容由easy mock随机生成，所生成的内容不符合规范。
 function updatePhoneNumInOrderTable() {
     var tableName = 'order_info';
     for (var i = 1; i < 121; i++) {
@@ -88,6 +94,7 @@ function updatePhoneNum(id, tableName) {
     });
 }
 
+// 更新数据库中open_city表update_time列的数据
 function updateTimeInOpenCity() {
     var tableName = 'open_city';
     for (var i = 1; i < 107; i++) {

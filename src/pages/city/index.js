@@ -1,7 +1,6 @@
 import React from 'react';
 import { Card, Button, Table, Form, Select, Modal, message } from 'antd';
 import axios from './../../axios/index';
-import Utils from './../../utils/utils';
 import BaseForm from '../../components/BaseForm'
 
 const FormItem = Form.Item;
@@ -61,28 +60,6 @@ export default class City extends React.Component {
     // 默认请求我们的接口数据
     requestList = () => {
         axios.requestList(this, '/open_city', this.params, false);
-        // let _this = this;
-        // axios.ajax({
-        //     url: '/open_city',
-        //     data: {
-        //         params: {
-        //             page: this.params.page
-        //         }
-        //     }
-        // }).then((res) => {
-        //     let list = res.result.item_list.map((item, index) => {
-        //         // table中的每一行都应该有对应的key属性。
-        //         item.key = index;
-        //         return item;
-        //     });
-        //     this.setState({
-        //         list: list,
-        //         pagination: Utils.pagination(res, (current) => {
-        //             _this.params.page = current;
-        //             _this.requestList();
-        //         })
-        //     })
-        // })
     }
 
     // 开通城市

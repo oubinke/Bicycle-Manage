@@ -5,8 +5,6 @@ import BaseForm from '../../components/BaseForm';
 import Utils from './../../utils/utils';
 import ETable from '../../components/ETable/index';
 
-const FormItem = Form.Item;
-
 export default class Order extends React.Component {
     state = {
         orderInfo: {},

@@ -1,4 +1,5 @@
 {
-    "root":"../build",
-    "port":8888
+    "_comment": "服务器端口和根目录的配置",
+    "root": "../build",
+    "port": 8888
 }

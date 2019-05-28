@@ -1,3 +1,7 @@
+/**
+ * 获取现在的时间，并将时间的格式转换为：YY-MM-DD hh:mm:ss
+ */
+
 function getFormatTime() {
     var date = new Date();
     var time = {
