@@ -18,7 +18,6 @@ connection.connect();
 updateCityName();
 updatePhoneNumAndIdNum();
 updatePhoneNumInOrderTable();
-updateTimeInOpenCity();
 
 // 数据库中open_city表，name列的内容由easy mock随机生成的，但页面查询时的选项只有三个，分别是北京、天津和上海。
 // 所以需要将数据库中name列的内容重新更新一下
