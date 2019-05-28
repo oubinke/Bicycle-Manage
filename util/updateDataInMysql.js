@@ -15,9 +15,9 @@ var connection = mysql.createConnection({
 
 connection.connect();
 
-// updateCityName();
-// updatePhoneNumAndIdNum();
-// updatePhoneNumInOrderTable();
+updateCityName();
+updatePhoneNumAndIdNum();
+updatePhoneNumInOrderTable();
 updateTimeInOpenCity();
 
 // 数据库中open_city表，name列的内容由easy mock随机生成的，但页面查询时的选项只有三个，分别是北京、天津和上海。
@@ -94,25 +94,6 @@ function updatePhoneNumInOrderTable() {
 function updatePhoneNum(id, tableName) {
     var phoneNum = getPhoneNum();
     var sql = 'UPDATE ' + tableName + ' SET phone_num = ' + phoneNum + ' WHERE id = ' + id;
-    connection.query(sql, function (err, result, fields) {
-        if (err) {
-            console.log('[SELECT ERROR] - ', err.message);
-            return;
-        }
-    });
-}
-
-// 更新数据库中open_city表update_time列的数据
-function updateTimeInOpenCity() {
-    var tableName = 'open_city';
-    for (var i = 1; i < 107; i++) {
-        updateTime(i, tableName);
-    }
-}
-
-function updateTime(id, tableName) {
-    var time = Mock.Random.datetime();
-    var sql = 'UPDATE ' + tableName + ' SET update_time = ' + '"' + time + '"' + ' WHERE id = ' + id;
     connection.query(sql, function (err, result, fields) {
         if (err) {
             console.log('[SELECT ERROR] - ', err.message);
