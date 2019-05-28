@@ -81,6 +81,14 @@ function updatePhoneNumInOrderTable() {
     for (var i = 1; i < 121; i++) {
         updatePhoneNum(i, tableName);
     }
+    var sql = 'UPDATE order_info SET distance=null,total_time=null,end_time=null,total_fee=null WHERE order_status=0';
+    connection.query(sql, function (err, result, fields) {
+        if (err) {
+            console.log('[SELECT ERROR] - ', err.message);
+            return;
+        }
+    });
+
 }
 
 function updatePhoneNum(id, tableName) {
