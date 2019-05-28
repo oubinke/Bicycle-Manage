@@ -40,8 +40,8 @@ function select(response, queryUrl) {
                 2: ' op_mode = 2'
             };
             sql += queryObject['city'] === '0' ? '' : (' WHERE' + city_name[queryObject['city']]);
-            sql += queryObject['mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE' + mode[queryObject['mode']]);
-            sql += queryObject['op_mode'] === '0' ? '' : (sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE' + op_mode[queryObject['op_mode']]);
+            sql += queryObject['mode'] === '0' ? '' : ((sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE') + mode[queryObject['mode']]);
+            sql += queryObject['op_mode'] === '0' ? '' : ((sql.indexOf('WHERE') > -1 ? ' AND' : ' WHERE') + op_mode[queryObject['op_mode']]);
             console.log(sql);
         } else if (tableName === 'employee') {
             var sql_name = queryObject['name'];

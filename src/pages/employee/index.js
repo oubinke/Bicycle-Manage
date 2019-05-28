@@ -107,30 +107,35 @@ export default class User extends React.Component {
     }
 
     handleSubmit = () => {
-        let type = this.state.type;
-        let employeeInfo = this.userForm.props.form.getFieldsValue();
-        if (type === 'detail') {
-            this.setState({
-                isVisible: false,
-            });
-            return;
-        } else if (type === 'edit') {
-            employeeInfo.id = this.state.userInfo.id;
-        }
-        axios.ajax({
-            url: type == 'create' ? '/employee/insert' : '/employee/update',
-            data: {
-                params: employeeInfo
-            }
-        }).then((res) => {
-            if (res.code == 0) {
-                this.setState({
-                    isVisible: false,
-                    selectedRowKeys: []
+        this.userForm.props.form.validateFields((err, values) => {
+            if (!err) {
+                let type = this.state.type;
+                let employeeInfo = this.userForm.props.form.getFieldsValue();
+                if (type === 'detail') {
+                    this.setState({
+                        isVisible: false,
+                    });
+                    return;
+                } else if (type === 'edit') {
+                    employeeInfo.id = this.state.userInfo.id;
+                }
+                axios.ajax({
+                    url: type == 'create' ? '/employee/insert' : '/employee/update',
+                    data: {
+                        params: employeeInfo
+                    }
+                }).then((res) => {
+                    if (res.code == 0) {
+                        this.setState({
+                            isVisible: false,
+                            selectedRowKeys: []
+                        })
+                        this.requestList();
+                    }
                 })
-                this.requestList();
             }
-        })
+        });
+
     }
 
     render() {
@@ -156,11 +161,11 @@ export default class User extends React.Component {
                 return isMarried ? '已婚' : '未婚'
             },
             width: 100
-        },{
+        }, {
             title: '手机号码',
             dataIndex: 'phone_num',
-            width: 200            
-        }, 
+            width: 200
+        },
         {
             title: '身份证号',
             dataIndex: 'identify_num',
@@ -239,7 +244,8 @@ class UserForm extends React.Component {
                         // 对于&&来说，如果第一个操作数是对象，则返回第二个操作数；如果第一个操作数是undefined，则返回undefined
                         (userInfo && type == 'detail') ? userInfo.name :
                             getFieldDecorator('name', {
-                                initialValue: userInfo.name
+                                initialValue: userInfo.name,
+                                rules: [{ required: true, message: 'Please input website!' }]
                             })(
                                 <Input type="text" placeholder="请输入姓名" />
                             )
@@ -249,7 +255,8 @@ class UserForm extends React.Component {
                     {
                         userInfo && type == 'detail' ? (userInfo.sex == 1 ? '男' : '女') :
                             getFieldDecorator('sex', {
-                                initialValue: userInfo.sex
+                                initialValue: userInfo.sex,
+                                rules: [{ required: true, message: 'Please input website!' }]
                             })(
                                 <RadioGroup>
                                     <Radio value={1}>男</Radio>
@@ -261,7 +268,8 @@ class UserForm extends React.Component {
                     {
                         userInfo && type == 'detail' ? (userInfo.isMarried == 0 ? '未婚' : '已婚') :
                             getFieldDecorator('isMarried', {
-                                initialValue: userInfo.isMarried
+                                initialValue: userInfo.isMarried,
+                                rules: [{ required: true, message: 'Please input website!' }]
                             })(
                                 <RadioGroup>
                                     <Radio value={0}>未婚</Radio>
@@ -274,7 +282,7 @@ class UserForm extends React.Component {
                         // 对于&&来说，如果第一个操作数是对象，则返回第二个操作数；如果第一个操作数是undefined，则返回undefined
                         (userInfo && type == 'detail') ? userInfo.phone_num :
                             getFieldDecorator('phone_num', {
-                                initialValue: userInfo.phone_num
+                                initialValue: userInfo.phone_num,
                             })(
                                 <Input type="text" placeholder="请输入手机号码" />
                             )

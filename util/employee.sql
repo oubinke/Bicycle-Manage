@@ -9,6 +9,6 @@ CREATE TABLE `employee` (
   `isMarried` int(11) NOT NULL DEFAULT 0,
   `phone_num` char(20) NOT NULL DEFAULT 0,
   `identify_num` char(20) NOT NULL DEFAULT '',
-  `address` char(20) NOT NULL DEFAULT '', 
+  `address` varchar(1000) NOT NULL DEFAULT '', 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -19,6 +19,7 @@ export default class IRouter extends React.Component {
                     <Route path="/" render={() =>
                         <Admin>
                             <Switch>
+                                <Route path="/" exact component={Home} />
                                 <Route path="/home" component={Home} />
                                 <Route path="/city" component={City} />
                                 <Route path="/order" component={Order} />
